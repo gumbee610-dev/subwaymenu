@@ -50,3 +50,4 @@ void setupMenu() {
 %ctor {
     setupMenu();
 }
+Menu *menu = [Menu sharedInstance];
