@@ -1,15 +1,14 @@
-#import <vector>
 #import <UIKit/UIKit.h>
 
 @interface Menu : UIView
--(id)initWithTitle:(NSString *)title titleColor:(UIColor *)titleColor titleFont:(NSString *)titleFont credits:(NSString *)credits headerColor:(UIColor *)headerColor switchOffColor:(UIColor *)switchOffColor switchOnColor:(UIColor *)switchOnColor switchTitleFont:(NSString *)switchTitleFont switchTitleColor:(UIColor *)switchTitleColor infoButtonColor:(UIColor *)infoButtonColor maxVisibleSwitches:(int)maxVisibleSwitches menuWidth:(CGFloat)menuWidth;
--(void)showMenuButton;
+@property (nonatomic, strong) NSString *title;
++ (instancetype)sharedInstance;
+- (void)setTitle:(NSString *)title;
+- (void)addSwitch:(NSString *)name description:(NSString *)description toggle:(bool *)toggle;
+- (void)addSlider:(NSString *)name description:(NSString *)description min:(float)min max:(float)max value:(float *)value;
+- (void)addButton:(NSString *)name action:(void (^)(void))action;
+- (void)showMenuButton;
 @end
 
-// Dummy classes to stop the "Not Found" errors
-@interface OffsetPatcher : UIButton
-@end
-@interface TextFieldSwitch : UIButton
-@end
-@interface SliderSwitch : UIButton
-@end
+// Creating a global variable for your setupMenu() to use
+extern Menu *menu;
