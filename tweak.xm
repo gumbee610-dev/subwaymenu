@@ -34,10 +34,16 @@ static bool modsEnabled = false;
     if (sender.state == UIGestureRecognizerStateBegan) {
         modsEnabled = !modsEnabled;
         NSString *status = modsEnabled ? @"Hacks ACTIVE" : @"Hacks DISABLED";
+        
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Subway Mod" message:status preferredStyle:UIAlertControllerStyleAlert];
         [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
         
-        UIViewController *root = [UIApplication sharedApplication].keyWindow.rootViewController;
+        // Use a safer way to find the root view to avoid the 'keyWindow' error
+        UIViewController *root = [UIApplication sharedApplication].windows.firstObject.rootViewController;
+        if (!root) {
+            root = self;
+        }
+        
         while (root.presentedViewController) {
             root = root.presentedViewController;
         }
@@ -53,16 +59,16 @@ static bool modsEnabled = false;
 - (int)hoverboards { return modsEnabled ? 999999999 : %orig; }
 - (bool)canAfford:(long long)amount { return modsEnabled ? YES : %orig; }
 - (bool)canAffordKeys:(long long)amount { return modsEnabled ? YES : %orig; }
-%end
+@end
 
 // 4. FREE SHOPPING & SCORE MULTIPLIER
 %hook StoreHandler
 - (bool)isItemPurchased:(id)itemIdentifier { return modsEnabled ? YES : %orig; }
-%end
+@end
 
 %hook GameStats
 - (int)multiplier { return modsEnabled ? 999 : %orig; }
-%end
+@end
 
 // 5. GAMEPLAY HACKS (God Mode & Jump)
 %hook CharacterPlayer
