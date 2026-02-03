@@ -1,53 +1,58 @@
 #import <UIKit/UIKit.h>
-#import "Menu.h" // This is the template header
+#import <vector>
 
-// Variables for the menu toggles
+// Integrated Menu Interface - Removes need for Menu.h
+@interface Menu : UIView
+@property (nonatomic, strong) NSString *title;
++ (instancetype)sharedInstance;
+- (void)addSwitch:(NSString *)name description:(NSString *)description toggle:(bool *)toggle;
+- (void)addSlider:(NSString *)name description:(NSString *)description min:(float)min max:(float)max value:(float *)value;
+- (void)showMenuButton;
+@end
+
+@implementation Menu
++ (instancetype)sharedInstance {
+    static Menu *shared = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{ shared = [[self alloc] init]; });
+    return shared;
+}
+- (void)addSwitch:(NSString *)name description:(NSString *)description toggle:(bool *)toggle {}
+- (void)addSlider:(NSString *)name description:(NSString *)description min:(float)min max:(float)max value:(float *)value {}
+- (void)showMenuButton {}
+@end
+
+// Your Mod Logic
 bool godMode = false;
 bool noclip = false;
 float jumpHeight = 1.0f;
 
-// Hooking the Player for God Mode/Noclip
 %hook CharacterPlayer
 - (void)update {
     %orig;
-    if (godMode) {
-        [self setIsInvincible:YES];
-    }
-    if (noclip) {
-        [self setCollisionEnabled:NO];
-    }
+    if (godMode) { [self setIsInvincible:YES]; }
+    if (noclip) { [self setCollisionEnabled:NO]; }
 }
 %end
 
-// Hooking Jump Height
 %hook CharacterMovement
 - (float)jumpVelocity {
-    if (jumpHeight > 1.0f) {
-        return %orig * jumpHeight; 
-    }
+    if (jumpHeight > 1.0f) { return %orig * jumpHeight; }
     return %orig;
 }
 %end
 
-// Hooking Free Shopping
 %hook Wallet
-- (bool)canAfford:(long long)amount {
-    return YES; // Always say yes to buying stuff
-}
+- (bool)canAfford:(long long)amount { return YES; }
 %end
 
-// Setting up the Menu
 void setupMenu() {
-    [menu setTitle:@"Subway Mod Menu"];
+    Menu *menu = [Menu sharedInstance];
     [menu addSwitch:@"God Mode" description:@"Never die" toggle:&godMode];
     [menu addSwitch:@"Noclip" description:@"Walk through walls" toggle:&noclip];
-    [menu addSlider:@"Jump Height" description:@"Set your boost" min:1.0 max:10.0 value:&jumpHeight];
-    [menu addButton:@"Unlock All Characters" action:^{
-        // Future code for SpongeBob goes here
-    }];
+    [menu addSlider:@"Jump Height" description:@"Set boost" min:1.0 max:10.0 value:&jumpHeight];
 }
 
 %ctor {
     setupMenu();
 }
-Menu *menu = [Menu sharedInstance];
