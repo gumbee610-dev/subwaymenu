@@ -2,13 +2,13 @@
 
 static bool modsEnabled = false;
 
-// Interfaces for the compiler
+// 1. Interfaces for the compiler
 @interface CharacterPlayer : NSObject
 - (void)setIsInvincible:(BOOL)isInvincible;
 - (void)setCollisionEnabled:(BOOL)collisionEnabled;
 @end
 
-// 1. THE TOGGLE (2-Finger Long Press)
+// 2. THE TOGGLE (2-Finger Long Press)
 %hook UIViewController
 - (void)viewDidAppear:(BOOL)animated {
     %orig;
@@ -24,28 +24,35 @@ static bool modsEnabled = false;
         NSString *status = modsEnabled ? @"Hacks ACTIVE" : @"Hacks DISABLED";
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Subway Mod" message:status preferredStyle:UIAlertControllerStyleAlert];
         [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
-        [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:alert animated:YES completion:nil];
+        
+        UIViewController *root = [UIApplication sharedApplication].keyWindow.rootViewController;
+        while (root.presentedViewController) {
+            root = root.presentedViewController;
+        }
+        [root presentViewController:alert animated:YES completion:nil];
     }
 }
 %end
 
-// 2. UNLIMITED EVERYTHING (Coins, Keys, Boards)
+// 3. UNLIMITED EVERYTHING
 %hook Wallet
 - (long long)coins { return modsEnabled ? 999999999 : %orig; }
 - (long long)keys { return modsEnabled ? 999999999 : %orig; }
 - (int)hoverboards { return modsEnabled ? 999999999 : %orig; }
-
-// Makes every "Buy" button work for free
 - (bool)canAfford:(long long)amount { return modsEnabled ? YES : %orig; }
 - (bool)canAffordKeys:(long long)amount { return modsEnabled ? YES : %orig; }
-@end
+%end
 
-// 3. STORE HACK (Free IAP)
+// 4. FREE SHOPPING & MULTIPLIER
 %hook StoreHandler
 - (bool)isItemPurchased:(id)itemIdentifier { return modsEnabled ? YES : %orig; }
 @end
 
-// 4. GAMEPLAY HACKS (God Mode/Jump)
+%hook GameStats
+- (int)multiplier { return modsEnabled ? 999 : %orig; }
+@end
+
+// 5. GAMEPLAY HACKS
 %hook CharacterPlayer
 - (void)update {
     %orig;
@@ -58,6 +65,6 @@ static bool modsEnabled = false;
 
 %hook CharacterMovement
 - (float)jumpVelocity {
-    return modsEnabled ? (%orig * 2.0f) : %orig; // Double jump height
+    return modsEnabled ? (%orig * 2.0f) : %orig;
 }
 %end
