@@ -1,9 +1,19 @@
 #import "Menu.h"
 
-// This is the core engine that makes the menu pop up and buttons work
+Menu *menu = [Menu sharedInstance];
+
 @implementation Menu
-- (instancetype)initWithTitle:(NSString *)title titleColor:(UIColor *)titleColor titleFont:(NSString *)titleFont credits:(NSString *)credits headerColor:(UIColor *)headerColor switchOffColor:(UIColor *)switchOffColor switchOnColor:(UIColor *)switchOnColor switchTitleFont:(NSString *)switchTitleFont switchTitleColor:(UIColor *)switchTitleColor infoButtonColor:(UIColor *)infoButtonColor maxVisibleSwitches:(int)maxVisibleSwitches menuWidth:(CGFloat)menuWidth menuIcon:(NSString *)menuIcon {
-    self = [super init];
-    return self;
++ (instancetype)sharedInstance {
+    static Menu *sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[self alloc] init];
+    });
+    return sharedInstance;
 }
+- (void)setTitle:(NSString *)title {}
+- (void)addSwitch:(NSString *)name description:(NSString *)description toggle:(bool *)toggle {}
+- (void)addSlider:(NSString *)name description:(NSString *)description min:(float)min max:(float)max value:(float *)value {}
+- (void)addButton:(NSString *)name action:(void (^)(void))action {}
+- (void)showMenuButton {}
 @end
