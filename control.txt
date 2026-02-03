@@ -1,0 +1,5 @@
+Package: com.yourname.subwaymenu
+Name: Subway Mod Menu
+Version: 1.0.0
+Architecture: iphoneos-arm
+Description: All-in-one menu for Subway Surfers
