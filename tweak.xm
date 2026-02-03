@@ -1,28 +1,31 @@
 #import <UIKit/UIKit.h>
-#import <vector>
 
-// Integrated Menu Interface - Removes need for Menu.h
+// 1. TELL THE COMPILER WHAT THE GAME CLASSES DO (The Fix)
+@interface CharacterPlayer : NSObject
+- (void)setIsInvincible:(BOOL)isInvincible;
+- (void)setCollisionEnabled:(BOOL)collisionEnabled;
+@end
+
+@interface CharacterMovement : NSObject
+@end
+
+@interface Wallet : NSObject
+@end
+
+// 2. FAKE MENU ENGINE TO PREVENT MISSING FILE ERRORS
 @interface Menu : UIView
-@property (nonatomic, strong) NSString *title;
 + (instancetype)sharedInstance;
 - (void)addSwitch:(NSString *)name description:(NSString *)description toggle:(bool *)toggle;
 - (void)addSlider:(NSString *)name description:(NSString *)description min:(float)min max:(float)max value:(float *)value;
-- (void)showMenuButton;
 @end
 
 @implementation Menu
-+ (instancetype)sharedInstance {
-    static Menu *shared = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{ shared = [[self alloc] init]; });
-    return shared;
-}
++ (instancetype)sharedInstance { return [super new]; }
 - (void)addSwitch:(NSString *)name description:(NSString *)description toggle:(bool *)toggle {}
 - (void)addSlider:(NSString *)name description:(NSString *)description min:(float)min max:(float)max value:(float *)value {}
-- (void)showMenuButton {}
 @end
 
-// Your Mod Logic
+// 3. YOUR MOD LOGIC
 bool godMode = false;
 bool noclip = false;
 float jumpHeight = 1.0f;
@@ -46,13 +49,9 @@ float jumpHeight = 1.0f;
 - (bool)canAfford:(long long)amount { return YES; }
 %end
 
-void setupMenu() {
+%ctor {
     Menu *menu = [Menu sharedInstance];
     [menu addSwitch:@"God Mode" description:@"Never die" toggle:&godMode];
     [menu addSwitch:@"Noclip" description:@"Walk through walls" toggle:&noclip];
     [menu addSlider:@"Jump Height" description:@"Set boost" min:1.0 max:10.0 value:&jumpHeight];
-}
-
-%ctor {
-    setupMenu();
 }
